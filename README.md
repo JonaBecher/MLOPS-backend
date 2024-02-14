@@ -1,6 +1,6 @@
 
 # MLFLOW-App
-Anwendung zum Deployen und Ausführen eines YoloV7 Modells auf Edge Devices direkt im Webbrowser. 
+Backend zum Deployen und Überwachen von Modellen auf Edge-Devices. 
 
 Pakete installieren: `pip install -r requirements.txt`
 
