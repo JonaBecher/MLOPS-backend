@@ -7,7 +7,7 @@ mlflow.set_tracking_uri("http://134.209.232.89:5000/")
 mlflow.tensorflow.autolog()
 mlflow.set_experiment("MNIST")
 
-with mlflow.start_run(run_name="test_ololo"):
+with mlflow.start_run(run_name="test"):
 
     mnist = tf.keras.datasets.mnist
     (x_train, y_train), (x_test, y_test) = mnist.load_data()

@@ -3,6 +3,7 @@ import datetime
 import math
 import os
 import json
+import threading
 
 import numpy as np
 import pandas as pd
@@ -24,12 +25,6 @@ from starlette.websockets import WebSocketDisconnect
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
     setup_db()
-
-    # make_dir('./projects/')
-    # insert_or_update_entity(Model, 1, {"active": True, "name": "test"})
-    # insert_or_update_entity(Model, 3, {"active": False, "name": "testNew"})
-    # insert_or_update_entity(Project, 1, {"name": "testProject"})
-    # print("id:", insert_or_update_entity(Device, None, {"projectId": 1}))
 
 
 async def poll_backend(interval=10):
@@ -68,8 +63,8 @@ def start_polling_in_thread():
 
 
 # Start the polling in a separate thread
-#polling_thread = threading.Thread(target=start_polling_in_thread)
-#polling_thread.start()
+polling_thread = threading.Thread(target=start_polling_in_thread)
+polling_thread.start()
 
 app.add_middleware(
     CORSMiddleware,
@@ -98,7 +93,7 @@ def get_models(projectId: int):
 @app.get("/{projectId}/getStats")
 def get_models(projectId: int):
 
-    sql = text(f"SELECT * FROM model_metrics WHERE created_at >= datetime('now', '-20 minutes') AND created_at <= datetime('now') AND modelId = (SELECT id from models where projectId = {projectId} AND active = 1 )")
+    sql = text(f"SELECT * FROM model_metrics WHERE created_at >= datetime('now', '-20 minutes') AND created_at <= datetime('now')")
     with db.engine.connect() as conn:
         result = conn.execute(sql).mappings().all()
         predicted_values = []
@@ -179,7 +174,6 @@ def get_active_model(projectId: int):
 async def get_model(projectId: int, file_name: str):
     project: Project = get_entity(Project, projectId)
     modelId = project.current_modelId
-    print(modelId)
     model_directory = f'./projects/{projectId}/{modelId}/js_model/'
 
     model_path = os.path.join(model_directory, file_name)
@@ -206,6 +200,7 @@ async def devices(projectId: int):
 
     return devices
 
+
 @app.post("/{projectId}/setDark")
 async def setDark(projectId: int):
     global dark
@@ -213,6 +208,7 @@ async def setDark(projectId: int):
     for key, websocket in connections.items():
         await websocket.send_json({"type": "setDark", "value": dark})
     return dark
+
 
 @app.post("/{projectId}/setModel")
 async def set_model(projectId: int, request: Request):
@@ -223,17 +219,17 @@ async def set_model(projectId: int, request: Request):
     if model.projectId != projectId:
         raise HTTPException(status_code=400, detail="Invalid project or model Id.")
 
-    #dir_path = f"./projects/{projectId}/{model_id}"
-    #delete_dir(dir_path)
-    #make_dir(dir_path)
-    #await download_model(model_id, dir_path)
-    #model_path = f"{dir_path}/best.onnx"
-    #js_model_path = f"{dir_path}/js_model"
-    #tmp_path = f"{dir_path}/tmp"
-    #make_dir(tmp_path)
-    #convert_model_to_js(model_path, js_model_path, tmp_path)
-    #delete_dir(tmp_path)
-    #zip_folder(js_model_path)
+    dir_path = f"./projects/{projectId}/{model_id}"
+    delete_dir(dir_path)
+    make_dir(dir_path)
+    await download_model(model_id, dir_path)
+    model_path = f"{dir_path}/best.onnx"
+    js_model_path = f"{dir_path}/js_model"
+    tmp_path = f"{dir_path}/tmp"
+    make_dir(tmp_path)
+    convert_model_to_js(model_path, js_model_path, tmp_path)
+    delete_dir(tmp_path)
+    zip_folder(js_model_path)
     project:Project = get_entity(Project, projectId, first=True)
 
     insert_or_update_entity(Project, projectId, {"current_modelId": model_id})
@@ -250,7 +246,7 @@ async def set_model(projectId: int, request: Request):
 async def websocket_endpoint(websocket: WebSocket, client_id: int):
     await websocket.accept()
     connections[client_id] = websocket
-    insert_or_update_entity(Device, client_id, {"last_online": datetime.datetime.now()})
+    insert_or_update_entity(Device, client_id, {"last_online": datetime.datetime.now(), "projectId": 300530342426941322})
     await websocket.send_json({"type": "modelVersion"})
     try:
         while True:
@@ -280,7 +276,6 @@ async def websocket_endpoint(websocket: WebSocket, client_id: int):
                     modelId = data["value"]["modelId"]
                     deviceId = data["value"]["deviceId"]
                     image = data["value"]["image"]
-                    print(logs)
                     insert_or_update_entity(ModelMetrics, None, {
                         "data": json.dumps(logs),
                         "modelId": modelId,
@@ -292,5 +287,3 @@ async def websocket_endpoint(websocket: WebSocket, client_id: int):
         insert_or_update_entity(Device, client_id, {"last_online": datetime.datetime.now()})
         print(f"""{client_id} disconnected.""")
         del connections[client_id]
-
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/

@@ -34,7 +34,6 @@ def convert_model_to_js(model_path, export_path, tmp_path):
     os.system(f'tensorflowjs_converter --input_format=tf_saved_model --output_format=tfjs_graph_model --signature_name=serving_default --saved_model_tags=serve "{tmp_path}" "{export_path}"')
 
 
-
 def zip_folder(folder_path):
     if not os.path.isdir(folder_path):
         raise ValueError("The provided path does not point to a directory.")
