@@ -26,6 +26,7 @@ ___
 - **POST /{projectId}/setModel**: Ein neues aktives Modell für ein Projekt festlegen.
 
 ### Verwaltung der Edge-Devices
+- **POST /{projectId}/registerDevice**: Registrieren eines neuen Edge-Devices.
 - **GET /{projectId}/devices**: Alle unter einem bestimmten Projekt registrierten Edge-Devices auflisten.
 - **POST /{projectId}/setDark**: Nachtmodus für die Live-Demo.
 
