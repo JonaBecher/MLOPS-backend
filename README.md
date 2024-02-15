@@ -49,7 +49,7 @@ ___
 
 ___
 ## Entwicklungswerkzeuge
-- **SQLite**: Datenbank
+- **SQLite**: Datenbank zur Presistierung von Metriken, Daten und Einstellungen.
 - **SQLAlchemy**: ORM für Datenbankoperationen.
 - **MLflow**: Integration für das Tracking von Experimenten, Modellen und Läufen.
 - **FastAPI**: Framework für die Erstellung von APIs mit Python.
