@@ -22,7 +22,7 @@ ___
 ### Modellverwaltung
 - **GET /{projectId}/models**: Alle Modelle abrufen, die einem bestimmten Projekt zugeordnet sind.
 - **GET /{projectId}/activeModel**: Das aktive Modell für ein bestimmtes Projekt herunterladen.
-- **GET /{projectId}/download/{model_id}/{file_name}**: Herunterladen der Modelle.
+- **GET /{projectId}/download/{model_id}/{file_name}**: Herunterladen bestimmter Modell Dateien für TensorflowJS.
 - **POST /{projectId}/setModel**: Ein neues aktives Modell für ein Projekt festlegen.
 
 ### Verwaltung der Edge-Devices
